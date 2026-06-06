@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routes import auth, vendors, rfqs, quotations, dashboard
+from app.routes import auth, vendors, rfqs, quotations, dashboard, approvals, purchase_orders, invoices
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -37,6 +37,9 @@ app.include_router(vendors.router, prefix=settings.API_V1_STR)
 app.include_router(rfqs.router, prefix=settings.API_V1_STR)
 app.include_router(quotations.router, prefix=settings.API_V1_STR)
 app.include_router(dashboard.router, prefix=settings.API_V1_STR)
+app.include_router(approvals.router, prefix=settings.API_V1_STR)
+app.include_router(purchase_orders.router, prefix=settings.API_V1_STR)
+app.include_router(invoices.router, prefix=settings.API_V1_STR)
 
 @app.get(
     "/", 
