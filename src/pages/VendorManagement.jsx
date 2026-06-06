@@ -31,7 +31,7 @@ export default function VendorManagement() {
 
   // Categories & Statuses for filters
   const categories = ['All', 'Electrical Components', 'Raw Materials', 'IT Hardware', 'Logistics / Services', 'Mechanical Equipment', 'Scientific Instruments'];
-  const statuses = ['All', 'Active', 'Inactive', 'Pending Verification'];
+  const statuses = ['All', 'Active', 'Pending Verification', 'Blocked'];
 
   // Detail fields mock data map (for a premium feel, since DashboardContext has simple objects)
   const vendorDetailsMap = {
@@ -65,6 +65,17 @@ export default function VendorManagement() {
 
   const handleExport = () => {
     addToast('Vendor registry exported to CSV successfully.', 'success');
+  };
+
+  const getStatusLabelCount = (status) => {
+    if (status === 'All') return vendors.length;
+    return vendors.filter(v => v.status === status).length;
+  };
+
+  const getStatusLabelText = (status) => {
+    if (status === 'All') return 'All';
+    if (status === 'Pending Verification') return 'Pending';
+    return status;
   };
 
   return (
@@ -146,7 +157,7 @@ export default function VendorManagement() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input 
             type="text" 
-            placeholder="Search by vendor ID, company name..."
+            placeholder="Search by name, gst number, cat..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm bg-slate-50/50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
@@ -165,17 +176,23 @@ export default function VendorManagement() {
             ))}
           </select>
         </div>
-        {/* Status Filter */}
-        <div className="w-full md:w-auto">
-          <select 
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="w-full md:w-44 px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            {statuses.map((s, i) => (
-              <option key={i} value={s}>{s === 'All' ? 'All Statuses' : s}</option>
-            ))}
-          </select>
+        {/* Horizontal tabs status filter - Matching Screen 4 */}
+        <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-850 overflow-x-auto w-full md:w-auto shrink-0 scrollbar-none gap-1">
+          {statuses.map((status, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => setSelectedStatus(status)}
+              className={`px-3 py-1.5 rounded-md text-xs font-bold whitespace-nowrap cursor-pointer transition-all
+                ${selectedStatus === status
+                  ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }
+              `}
+            >
+              {getStatusLabelText(status)} ({getStatusLabelCount(status)})
+            </button>
+          ))}
         </div>
       </div>
 
@@ -239,11 +256,13 @@ export default function VendorManagement() {
                           ${vendor.status === 'Active' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : ''}
                           ${vendor.status === 'Inactive' ? 'bg-slate-500/10 text-slate-500' : ''}
                           ${vendor.status === 'Pending Verification' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : ''}
+                          ${vendor.status === 'Blocked' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' : ''}
                         `}>
                           <span className={`h-1.5 w-1.5 rounded-full 
                             ${vendor.status === 'Active' ? 'bg-emerald-500' : ''}
                             ${vendor.status === 'Inactive' ? 'bg-slate-400' : ''}
                             ${vendor.status === 'Pending Verification' ? 'bg-amber-500' : ''}
+                            ${vendor.status === 'Blocked' ? 'bg-rose-500' : ''}
                           `} />
                           {vendor.status}
                         </span>

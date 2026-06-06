@@ -65,7 +65,7 @@ export default function ReportsAnalytics() {
         
         <button
           onClick={handleExportPDF}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-md shadow-indigo-600/15 hover:shadow-indigo-650/25 transition-all cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-md shadow-indigo-600/15 hover:shadow-indigo-600/25 transition-all cursor-pointer"
         >
           <Sparkles className="h-4 w-4" />
           Export Executive Report

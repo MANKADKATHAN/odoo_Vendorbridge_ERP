@@ -158,7 +158,7 @@ export default function PoInvoiceGeneration() {
                     </button>
                     <button
                       onClick={() => handleSendSupplier(selectedPo.id, selectedPo.vendor)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-650 hover:bg-indigo-750 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/10 cursor-pointer transition-all"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/10 cursor-pointer transition-all"
                     >
                       <Send className="h-4 w-4" />
                       Send to Supplier
@@ -268,7 +268,7 @@ export default function PoInvoiceGeneration() {
                       </div>
                       <div className="flex justify-between text-slate-900 dark:text-white font-bold text-sm pt-2 border-t border-slate-100 dark:border-slate-800">
                         <span>Grand Total:</span>
-                        <span className="font-mono text-indigo-650 dark:text-indigo-400">${(selectedPo.amount * 1.18).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                        <span className="font-mono text-indigo-600 dark:text-indigo-400">${(selectedPo.amount * 1.18).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                       </div>
                     </div>
                   </div>

@@ -10,11 +10,12 @@ import {
   ChevronLeft, 
   ChevronRight,
   ShieldCheck,
-  ClipboardCheck
+  ClipboardCheck,
+  LogOut
 } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
 
-export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen }) {
+export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen, currentUser, onLogout }) {
   const { stats } = useDashboard();
 
   const menuItems = [
@@ -117,15 +118,26 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
 
         {/* Sidebar Footer */}
         <div className="p-4 border-t border-slate-800 shrink-0">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 font-bold shrink-0 border border-slate-700">
-              AD
-            </div>
-            {!isCollapsed && (
-              <div className="truncate flex-1 text-left">
-                <p className="text-xs font-semibold text-white leading-tight">Admin Demo</p>
-                <p className="text-[10px] text-slate-500 truncate leading-tight">procure@vendorbridge.com</p>
+          <div className="flex items-center justify-between gap-3 overflow-hidden">
+            <div className="flex items-center gap-3 overflow-hidden min-w-0">
+              <div className="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-350 font-bold shrink-0 border border-slate-700 select-none">
+                {currentUser?.name?.split(' ').map(n => n.charAt(0)).join('') || 'AD'}
               </div>
+              {!isCollapsed && (
+                <div className="truncate flex-1 text-left">
+                  <p className="text-xs font-semibold text-white leading-tight truncate">{currentUser?.name || 'Admin Demo'}</p>
+                  <p className="text-[10px] text-slate-500 truncate leading-tight mt-0.5">{currentUser?.email || 'procure@vendorbridge.com'}</p>
+                </div>
+              )}
+            </div>
+            {!isCollapsed && onLogout && (
+              <button 
+                onClick={onLogout}
+                className="p-1.5 rounded-lg border border-slate-850 hover:border-slate-750 bg-slate-950/20 hover:bg-slate-800/80 text-slate-400 hover:text-rose-400 transition-colors shrink-0 cursor-pointer"
+                title="Sign Out"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
             )}
           </div>
         </div>

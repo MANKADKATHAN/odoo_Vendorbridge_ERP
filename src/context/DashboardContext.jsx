@@ -145,7 +145,9 @@ export const DashboardProvider = ({ children }) => {
     { id: 'VEN-0003', name: 'Dynatech Systems Inc.', category: 'IT Hardware', rating: 4.9, status: 'Active' },
     { id: 'VEN-0004', name: 'Nexus Logistics & Telecom', category: 'Logistics / Services', rating: 4.2, status: 'Active' },
     { id: 'VEN-0005', name: 'Vickers Hydraulics Corp.', category: 'Mechanical Equipment', rating: 4.6, status: 'Active' },
-    { id: 'VEN-0006', name: 'Opto-Instruments Gmbh', category: 'Scientific Instruments', rating: 4.7, status: 'Active' }
+    { id: 'VEN-0006', name: 'Opto-Instruments Gmbh', category: 'Scientific Instruments', rating: 4.7, status: 'Active' },
+    { id: 'VEN-0007', name: 'FastLog Transport & Cargo', category: 'Logistics / Services', rating: 3.9, status: 'Blocked' },
+    { id: 'VEN-0008', name: 'Infra Supplies Pvt Ltd', category: 'Raw Materials', rating: 4.5, status: 'Pending Verification' }
   ]);
 
   // Notifications state

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Mail, Lock, Eye, EyeOff, User, Building } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, Eye, EyeOff, User, Building, Phone, Globe, Info } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
 
 export default function Login({ onLoginSuccess }) {
@@ -12,20 +12,24 @@ export default function Login({ onLoginSuccess }) {
   const [password, setPassword] = useState('password123');
 
   // Sign Up inputs
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [signUpEmail, setSignUpEmail] = useState('');
-  const [signUpPassword, setSignUpPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [country, setCountry] = useState('');
   const [signUpRole, setSignUpRole] = useState('PROCUREMENT_OFFICER');
+  const [additionalInfo, setAdditionalInfo] = useState('');
+  const [signUpPassword, setSignUpPassword] = useState('');
 
-  // Validation state triggers (true means touched and has error)
+  // Validation states
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   
-  const [signUpNameError, setSignUpNameError] = useState('');
+  const [signUpFirstNameError, setSignUpFirstNameError] = useState('');
+  const [signUpLastNameError, setSignUpLastNameError] = useState('');
   const [signUpEmailError, setSignUpEmailError] = useState('');
   const [signUpPasswordError, setSignUpPasswordError] = useState('');
 
-  // Validate Email on Blur
   const validateEmail = (val, isSignUp = false) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const errorMsg = !emailRegex.test(val) ? 'Please enter a valid work email address.' : '';
@@ -36,7 +40,6 @@ export default function Login({ onLoginSuccess }) {
     }
   };
 
-  // Validate Password on Blur
   const validatePassword = (val, isSignUp = false) => {
     const errorMsg = val.length < 6 ? 'Password must be at least 6 characters in length.' : '';
     if (isSignUp) {
@@ -48,8 +51,6 @@ export default function Login({ onLoginSuccess }) {
 
   const handleSignInSubmit = (e) => {
     e.preventDefault();
-    
-    // Explicit Validation Trigger before submit
     const isEmailInvalid = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const isPasswordInvalid = password.length < 6;
     
@@ -61,7 +62,6 @@ export default function Login({ onLoginSuccess }) {
       return;
     }
 
-    // Auth validation matches
     let role = 'Procurement Lead';
     if (email === 'vendor@vendorbridge.com') role = 'Vendor Supplier';
     if (email === 'manager@vendorbridge.com') role = 'Financial Manager';
@@ -72,34 +72,34 @@ export default function Login({ onLoginSuccess }) {
 
   const handleSignUpSubmit = (e) => {
     e.preventDefault();
-    
-    const isNameInvalid = name.trim().length === 0;
+    const isFirstNameInvalid = firstName.trim().length === 0;
+    const isLastNameInvalid = lastName.trim().length === 0;
     const isEmailInvalid = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signUpEmail);
     const isPasswordInvalid = signUpPassword.length < 6;
     
-    if (isNameInvalid) setSignUpNameError('Display name cannot be empty.');
+    if (isFirstNameInvalid) setSignUpFirstNameError('First name is required.');
+    if (isLastNameInvalid) setSignUpLastNameError('Last name is required.');
     if (isEmailInvalid) setSignUpEmailError('Please enter a valid work email address.');
     if (isPasswordInvalid) setSignUpPasswordError('Password must be at least 6 characters in length.');
     
-    if (isNameInvalid || isEmailInvalid || isPasswordInvalid) {
+    if (isFirstNameInvalid || isLastNameInvalid || isEmailInvalid || isPasswordInvalid) {
       addToast('Please correct form validation errors before registering.', 'warning');
       return;
     }
 
-    addToast('Vendor registration request submitted for audit compliance.', 'info');
-    setIsLoginView(true); // Switch to sign in view
+    addToast('Supplier registration submitted successfully. Approvals pending.', 'success');
+    setIsLoginView(true);
   };
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 sm:p-6 font-sans">
       
       {/* Centered Split-Card Container */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[500px]">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[550px]">
         
         {/* Left Side: Branding / Illustration Area */}
-        <div className="md:col-span-6 bg-slate-900 border-r border-slate-800 p-8 flex flex-col justify-between text-left relative overflow-hidden">
-          {/* Glowing abstract graphic */}
-          <div className="absolute top-1/3 left-1/3 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-650/15 rounded-full filter blur-[100px] pointer-events-none" />
+        <div className="md:col-span-5 bg-slate-900 border-r border-slate-800 p-8 flex flex-col justify-between text-left relative overflow-hidden">
+          <div className="absolute top-1/3 left-1/3 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-600/15 rounded-full filter blur-[100px] pointer-events-none" />
           
           <div className="flex items-center gap-3 relative z-10">
             <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
@@ -128,14 +128,13 @@ export default function Login({ onLoginSuccess }) {
         </div>
 
         {/* Right Side: The Functional Form Card */}
-        <div className="md:col-span-6 p-8 flex flex-col justify-center text-left">
+        <div className="md:col-span-7 p-8 flex flex-col justify-center text-left">
           
           {/* Card Toggle Tab Headers */}
           <div className="flex border-b border-slate-800 mb-6 shrink-0">
             <button
               onClick={() => {
                 setIsLoginView(true);
-                // Clear validation states
                 setEmailError('');
                 setPasswordError('');
               }}
@@ -151,8 +150,8 @@ export default function Login({ onLoginSuccess }) {
             <button
               onClick={() => {
                 setIsLoginView(false);
-                // Clear validation states
-                setSignUpNameError('');
+                setSignUpFirstNameError('');
+                setSignUpLastNameError('');
                 setSignUpEmailError('');
                 setSignUpPasswordError('');
               }}
@@ -171,6 +170,13 @@ export default function Login({ onLoginSuccess }) {
             /* LOGIN FORM */
             <form onSubmit={handleSignInSubmit} className="space-y-4">
               
+              {/* Photo Avatar Placeholder Circle */}
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 rounded-full border-2 border-slate-800 bg-slate-950 flex items-center justify-center text-slate-500 text-xs font-semibold uppercase">
+                  Photo
+                </div>
+              </div>
+
               {/* Email Field */}
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-400">Email Address</label>
@@ -185,7 +191,7 @@ export default function Login({ onLoginSuccess }) {
                     }}
                     onBlur={(e) => validateEmail(e.target.value, false)}
                     placeholder="procure@vendorbridge.com"
-                    className={`w-full pl-10 pr-4 py-2 bg-slate-950 border rounded-lg text-xs text-slate-100 placeholder-slate-650 focus:outline-none transition-all
+                    className={`w-full pl-10 pr-4 py-2 bg-slate-950 border rounded-lg text-xs text-slate-100 placeholder-slate-655 focus:outline-none transition-all
                       ${emailError 
                         ? 'border-rose-500 focus:ring-1 focus:ring-rose-500' 
                         : 'border-slate-800 focus:ring-1 focus:ring-indigo-500'
@@ -222,7 +228,7 @@ export default function Login({ onLoginSuccess }) {
                     }}
                     onBlur={(e) => validatePassword(e.target.value, false)}
                     placeholder="••••••••"
-                    className={`w-full pl-10 pr-10 py-2 bg-slate-950 border rounded-lg text-xs text-slate-100 placeholder-slate-650 focus:outline-none transition-all
+                    className={`w-full pl-10 pr-10 py-2 bg-slate-950 border rounded-lg text-xs text-slate-100 placeholder-slate-655 focus:outline-none transition-all
                       ${passwordError 
                         ? 'border-rose-500 focus:ring-1 focus:ring-rose-500' 
                         : 'border-slate-800 focus:ring-1 focus:ring-indigo-500'
@@ -251,70 +257,153 @@ export default function Login({ onLoginSuccess }) {
               </button>
             </form>
           ) : (
-            /* SIGNUP FORM */
+            /* SIGNUP REGISTRATION FORM - Matching Screen 2 */
             <form onSubmit={handleSignUpSubmit} className="space-y-4">
               
-              {/* Full Name */}
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-400">Full Name</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                  <input 
-                    type="text"
-                    value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                      if (signUpNameError) setSignUpNameError('');
-                    }}
-                    onBlur={(e) => setSignUpNameError(e.target.value.trim() === '' ? 'Display name is required.' : '')}
-                    placeholder="John Doe"
-                    className={`w-full pl-10 pr-4 py-2 bg-slate-950 border rounded-lg text-xs text-slate-100 placeholder-slate-650 focus:outline-none transition-all
-                      ${signUpNameError 
-                        ? 'border-rose-500 focus:ring-1 focus:ring-rose-500' 
-                        : 'border-slate-800 focus:ring-1 focus:ring-indigo-500'
-                      }
-                    `}
-                    required
-                  />
+              {/* Photo Avatar Placeholder Circle */}
+              <div className="flex justify-center mb-2">
+                <div className="w-14 h-14 rounded-full border-2 border-slate-800 bg-slate-950 flex items-center justify-center text-slate-500 text-[10px] font-semibold uppercase">
+                  Photo
                 </div>
-                {signUpNameError && (
-                  <p className="text-[10px] text-rose-500 font-semibold animate-slide-in">{signUpNameError}</p>
-                )}
               </div>
 
-              {/* Email Address */}
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-400">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                  <input 
-                    type="email"
-                    value={signUpEmail}
-                    onChange={(e) => {
-                      setSignUpEmail(e.target.value);
-                      if (signUpEmailError) setSignUpEmailError('');
-                    }}
-                    onBlur={(e) => validateEmail(e.target.value, true)}
-                    placeholder="sales@company.com"
-                    className={`w-full pl-10 pr-4 py-2 bg-slate-950 border rounded-lg text-xs text-slate-100 placeholder-slate-650 focus:outline-none transition-all
-                      ${signUpEmailError 
-                        ? 'border-rose-500 focus:ring-1 focus:ring-rose-500' 
-                        : 'border-slate-800 focus:ring-1 focus:ring-indigo-500'
-                      }
-                    `}
-                    required
-                  />
+              {/* Grid: First Name & Last Name */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-400">First Name</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                    <input 
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => {
+                        setFirstName(e.target.value);
+                        if (signUpFirstNameError) setSignUpFirstNameError('');
+                      }}
+                      onBlur={(e) => setSignUpFirstNameError(e.target.value.trim() === '' ? 'First name is required.' : '')}
+                      placeholder="Jane"
+                      className={`w-full pl-10 pr-4 py-1.5 bg-slate-955 border rounded-lg text-xs text-slate-100 placeholder-slate-655 focus:outline-none transition-all
+                        ${signUpFirstNameError 
+                          ? 'border-rose-500 focus:ring-1 focus:ring-rose-500' 
+                          : 'border-slate-800 focus:ring-1 focus:ring-indigo-500'
+                        }
+                      `}
+                      required
+                    />
+                  </div>
+                  {signUpFirstNameError && (
+                    <p className="text-[10px] text-rose-500 font-semibold animate-slide-in">{signUpFirstNameError}</p>
+                  )}
                 </div>
-                {signUpEmailError && (
-                  <p className="text-[10px] text-rose-500 font-semibold animate-slide-in">{signUpEmailError}</p>
-                )}
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-400">Last Name</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                    <input 
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => {
+                        setLastName(e.target.value);
+                        if (signUpLastNameError) setSignUpLastNameError('');
+                      }}
+                      onBlur={(e) => setSignUpLastNameError(e.target.value.trim() === '' ? 'Last name is required.' : '')}
+                      placeholder="Doe"
+                      className={`w-full pl-10 pr-4 py-1.5 bg-slate-955 border rounded-lg text-xs text-slate-100 placeholder-slate-655 focus:outline-none transition-all
+                        ${signUpLastNameError 
+                          ? 'border-rose-500 focus:ring-1 focus:ring-rose-500' 
+                          : 'border-slate-800 focus:ring-1 focus:ring-indigo-500'
+                        }
+                      `}
+                      required
+                    />
+                  </div>
+                  {signUpLastNameError && (
+                    <p className="text-[10px] text-rose-500 font-semibold animate-slide-in">{signUpLastNameError}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Grid: Email Address & Phone Number */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-400">Email Address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                    <input 
+                      type="email"
+                      value={signUpEmail}
+                      onChange={(e) => {
+                        setSignUpEmail(e.target.value);
+                        if (signUpEmailError) setSignUpEmailError('');
+                      }}
+                      onBlur={(e) => validateEmail(e.target.value, true)}
+                      placeholder="jane.doe@company.com"
+                      className={`w-full pl-10 pr-4 py-1.5 bg-slate-955 border rounded-lg text-xs text-slate-100 placeholder-slate-655 focus:outline-none transition-all
+                        ${signUpEmailError 
+                          ? 'border-rose-500 focus:ring-1 focus:ring-rose-500' 
+                          : 'border-slate-800 focus:ring-1 focus:ring-indigo-500'
+                        }
+                      `}
+                      required
+                    />
+                  </div>
+                  {signUpEmailError && (
+                    <p className="text-[10px] text-rose-500 font-semibold animate-slide-in">{signUpEmailError}</p>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-400">Phone Number</label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                    <input 
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+1 (555) 0199"
+                      className="w-full pl-10 pr-4 py-1.5 bg-slate-955 border border-slate-800 rounded-lg text-xs text-slate-100 placeholder-slate-655 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Grid: Role Selection & Country */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-400">Role Access</label>
+                  <select
+                    value={signUpRole}
+                    onChange={(e) => setSignUpRole(e.target.value)}
+                    className="w-full px-3 py-1.5 bg-slate-955 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  >
+                    <option value="PROCUREMENT_OFFICER">Procurement Officer</option>
+                    <option value="VENDOR">Vendor</option>
+                    <option value="MANAGER">Manager / Approver</option>
+                    <option value="ADMIN">Admin</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-400">Country</label>
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                    <input 
+                      type="text"
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      placeholder="United States"
+                      className="w-full pl-10 pr-4 py-1.5 bg-slate-955 border border-slate-800 rounded-lg text-xs text-slate-100 placeholder-slate-655 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Password */}
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-400">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
                   <input 
                     type="password"
                     value={signUpPassword}
@@ -323,8 +412,8 @@ export default function Login({ onLoginSuccess }) {
                       if (signUpPasswordError) setSignUpPasswordError('');
                     }}
                     onBlur={(e) => validatePassword(e.target.value, true)}
-                    placeholder="Min 6 characters"
-                    className={`w-full pl-10 pr-4 py-2 bg-slate-950 border rounded-lg text-xs text-slate-100 placeholder-slate-650 focus:outline-none transition-all
+                    placeholder="••••••••"
+                    className={`w-full pl-10 pr-4 py-1.5 bg-slate-955 border rounded-lg text-xs text-slate-100 placeholder-slate-655 focus:outline-none transition-all
                       ${signUpPasswordError 
                         ? 'border-rose-500 focus:ring-1 focus:ring-rose-500' 
                         : 'border-slate-800 focus:ring-1 focus:ring-indigo-500'
@@ -338,26 +427,26 @@ export default function Login({ onLoginSuccess }) {
                 )}
               </div>
 
-              {/* Strict dropdown access role selector */}
+              {/* Additional Information Textarea */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-400">ERP Access Role Group</label>
-                <select
-                  value={signUpRole}
-                  onChange={(e) => setSignUpRole(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                >
-                  <option value="PROCUREMENT_OFFICER">Procurement Officer</option>
-                  <option value="VENDOR">Vendor</option>
-                  <option value="MANAGER">Manager / Approver</option>
-                  <option value="ADMIN">Admin</option>
-                </select>
+                <label className="text-xs font-semibold text-slate-400">Additional Information</label>
+                <div className="relative">
+                  <Info className="absolute left-3 top-3.5 h-3.5 w-3.5 text-slate-500" />
+                  <textarea 
+                    rows="2"
+                    value={additionalInfo}
+                    onChange={(e) => setAdditionalInfo(e.target.value)}
+                    placeholder="Enter compliance details or registration notes..."
+                    className="w-full pl-10 pr-4 py-2 bg-slate-955 border border-slate-800 rounded-lg text-xs text-slate-100 placeholder-slate-655 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
               </div>
 
               <button
                 type="submit"
                 className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-indigo-600/10 cursor-pointer"
               >
-                Create Security Account
+                Register
               </button>
             </form>
           )}

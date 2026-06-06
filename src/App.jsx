@@ -23,7 +23,7 @@ function AppContent() {
   }
 
   return (
-    <Layout>
+    <Layout currentUser={currentUser} onLogout={() => setCurrentUser(null)}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/vendors" element={<VendorManagement />} />

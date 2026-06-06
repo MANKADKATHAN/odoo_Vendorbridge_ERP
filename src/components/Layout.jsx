@@ -3,7 +3,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import ToastContainer from './ToastContainer';
 
-export default function Layout({ children }) {
+export default function Layout({ children, currentUser, onLogout }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -15,12 +15,18 @@ export default function Layout({ children }) {
         setIsCollapsed={setIsCollapsed} 
         isMobileOpen={isMobileOpen} 
         setIsMobileOpen={setIsMobileOpen} 
+        currentUser={currentUser}
+        onLogout={onLogout}
       />
 
       {/* Main Viewport Container */}
       <div className="flex flex-col flex-1 h-full min-w-0 overflow-hidden">
         {/* Top Header */}
-        <Header setIsMobileOpen={setIsMobileOpen} />
+        <Header 
+          setIsMobileOpen={setIsMobileOpen} 
+          currentUser={currentUser}
+          onLogout={onLogout}
+        />
 
         {/* Dynamic Content Viewport */}
         <main className="flex-1 overflow-y-auto p-6 space-y-6">

@@ -7,7 +7,7 @@ import {
   Building, 
   Clock, 
   DollarSign, 
-  HelpCircle,
+  Percent,
   CheckCircle,
   FileCheck
 } from 'lucide-react';
@@ -17,19 +17,22 @@ export default function VendorQuoteSubmission() {
   const { rfqs, addToast } = useDashboard();
   const [selectedRfqId, setSelectedRfqId] = useState('RFQ-2026-012');
   const [deliveryDays, setDeliveryDays] = useState(7);
+  const [validTill, setValidTill] = useState('30 Days');
+  const [taxPercent, setTaxPercent] = useState(9);
+  const [gstPercent, setGstPercent] = useState(9);
   const [notes, setNotes] = useState('');
   
   // Custom items list mapped to RFQs
   const rfqItemsMap = {
     'RFQ-2026-012': [
-      { id: 101, name: '10 AWG Copper Grounding Wire (Green)', qty: 1000, unit: 'Meters', defaultPrice: 4.5 },
-      { id: 102, name: 'Heavy Duty 3-Phase Core Cable 16mm', qty: 250, unit: 'Meters', defaultPrice: 45.0 }
+      { id: 101, name: 'Ergonomic chairs', qty: 25, unit: 'Units', defaultPrice: 3500 },
+      { id: 102, name: 'Standing desk', qty: 10, unit: 'Units', defaultPrice: 8200 }
     ],
     'RFQ-2026-013': [
-      { id: 201, name: 'Samsung 990 Pro 2TB NVMe PCIe 4.0 SSD', qty: 50, unit: 'Units', defaultPrice: 130.0 }
+      { id: 201, name: 'Samsung 990 Pro 2TB NVMe PCIe 4.0 SSD', qty: 50, unit: 'Units', defaultPrice: 130 }
     ],
     'RFQ-2026-014': [
-      { id: 301, name: 'SMC Pneumatic Solenoid Valve 24VDC', qty: 15, unit: 'Units', defaultPrice: 120.0 }
+      { id: 301, name: 'SMC Pneumatic Solenoid Valve 24VDC', qty: 15, unit: 'Units', defaultPrice: 120 }
     ]
   };
 
@@ -39,27 +42,39 @@ export default function VendorQuoteSubmission() {
   // Initialize/Update items when selected RFQ changes
   useEffect(() => {
     const defaultItems = rfqItemsMap[selectedRfqId] || [];
-    // Initialize unit price inputs to empty or default
     setItems(defaultItems.map(item => ({
       ...item,
-      unitPrice: ''
+      unitPrice: item.defaultPrice // Default to database seed figures
     })));
   }, [selectedRfqId]);
 
   const handlePriceChange = (itemId, val) => {
-    // Sanitize non-negative decimals
     const numericVal = val === '' ? '' : Math.max(0, parseFloat(val) || 0);
     setItems(prev => prev.map(item => 
       item.id === itemId ? { ...item, unitPrice: val === '' ? '' : numericVal } : item
     ));
   };
 
-  // Subtotal Calculation
+  const handleDeliveryChange = (itemId, val) => {
+    const numericVal = val === '' ? '' : Math.max(1, parseInt(val) || 1);
+    setItems(prev => prev.map(item => 
+      item.id === itemId ? { ...item, deliveryDays: val === '' ? '' : numericVal } : item
+    ));
+  };
+
+  // Calculations
   const calculateSubtotal = () => {
     return items.reduce((sum, item) => {
       const price = parseFloat(item.unitPrice) || 0;
       return sum + (price * item.qty);
     }, 0);
+  };
+
+  const calculateGrandTotal = () => {
+    const subtotal = calculateSubtotal();
+    const tax = subtotal * ((parseFloat(taxPercent) || 0) / 100);
+    const gst = subtotal * ((parseFloat(gstPercent) || 0) / 100);
+    return subtotal + tax + gst;
   };
 
   const handleSaveDraft = () => {
@@ -72,18 +87,10 @@ export default function VendorQuoteSubmission() {
       addToast('Please enter unit prices for all line items before submitting.', 'warning');
       return;
     }
-    if (!deliveryDays || deliveryDays <= 0) {
-      addToast('Please input a valid delivery timeline.', 'warning');
-      return;
-    }
 
-    const subtotal = calculateSubtotal();
-    addToast(`Quotation of $${subtotal.toLocaleString()} submitted successfully for ${selectedRfqId}!`, 'success');
-    
-    // Clear inputs or reset form
-    setItems(items.map(item => ({ ...item, unitPrice: '' })));
+    const total = calculateGrandTotal();
+    addToast(`Quotation of $${total.toLocaleString(undefined, { maximumFractionDigits: 2 })} submitted successfully for ${selectedRfqId}!`, 'success');
     setNotes('');
-    setDeliveryDays(7);
   };
 
   return (
@@ -91,8 +98,8 @@ export default function VendorQuoteSubmission() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-left">
         <div>
-          <h1 className="text-2xl font-bold font-heading text-slate-900 dark:text-white">Quotation Submission Desk</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">As a vendor, provide pricing proposals and estimated delivery lead times for active RFQs.</p>
+          <h1 className="text-2xl font-bold font-heading text-slate-900 dark:text-white">Submit Quotations</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">RFQ: {selectedRfq?.subject || 'office furniture procurement q2'} - deadline {selectedRfq?.closeDate || '15 June 2025'}</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Select RFQ:</span>
@@ -112,13 +119,12 @@ export default function VendorQuoteSubmission() {
         
         {/* Left 1/3 Panel: Read-only RFQ Details */}
         <div className="bg-slate-900 border border-slate-800 text-slate-350 p-6 rounded-xl space-y-6 lg:col-span-1 text-left flex flex-col justify-between relative overflow-hidden shadow-md">
-          {/* Decorative glowing gradient */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full filter blur-3xl pointer-events-none" />
           
           <div className="space-y-5">
             <div className="flex items-center gap-2 pb-3.5 border-b border-slate-800 shrink-0">
               <FileText className="h-5 w-5 text-indigo-400" />
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider">RFQ Requisition Details</h2>
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider">RFQ Summary</h2>
             </div>
 
             {/* Read-only Fields */}
@@ -129,29 +135,21 @@ export default function VendorQuoteSubmission() {
               </div>
 
               <div>
-                <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Requisition Subject</p>
-                <p className="font-semibold text-white mt-1 leading-relaxed text-sm">{selectedRfq?.subject || 'Bulk Materials'}</p>
-              </div>
-
-              <div>
-                <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Department Description</p>
-                <p className="text-slate-400 mt-1 leading-relaxed text-[11px]">
-                  {selectedRfqId === 'RFQ-2026-012' && 'Bidding open for premium copper grounding wires and three-phase industrial cables required for the plant expansion layout.'}
-                  {selectedRfqId === 'RFQ-2026-013' && 'Procuring PCIe Gen 4.0 high-speed solid state storage modules for the core cloud servers deployment.'}
-                  {selectedRfqId === 'RFQ-2026-014' && 'Procurement of pneumatic solenoid valve assemblies for automated hydraulic fluid loops controls.'}
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Line Items Scope</p>
+                <p className="font-semibold text-white mt-1 leading-relaxed text-[11px] p-3 bg-slate-950/40 border border-slate-850 rounded-lg">
+                  {selectedRfqId === 'RFQ-2026-012' ? 'Ergonomic chairs * 25, standing desk * 10 - category Furniture' : 'Standard requisitions list.'}
                 </p>
               </div>
 
               <div>
                 <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Submission Deadline</p>
                 <div className="flex items-center gap-2 text-rose-450 mt-1.5">
-                  <Calendar className="h-4 w-4 shrink-0" />
-                  <span className="font-semibold">{selectedRfq?.closeDate || 'Jun 30, 2026'}</span>
+                  <span className="font-semibold">{selectedRfq?.closeDate || '15 June 2025'}</span>
                 </div>
               </div>
 
               <div>
-                <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Issuing Company</p>
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Company Name</p>
                 <div className="flex items-center gap-2 text-slate-350 mt-1.5">
                   <Building className="h-4 w-4 text-slate-500 shrink-0" />
                   <span className="font-semibold text-slate-200">VendorBridge Corp.</span>
@@ -170,38 +168,50 @@ export default function VendorQuoteSubmission() {
           <form onSubmit={handleSubmitQuotation} className="space-y-6">
             <div className="flex items-center gap-2 pb-3.5 border-b border-slate-100 dark:border-slate-800">
               <FileCheck className="h-5 w-5 text-indigo-500" />
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Vendor Quotation Entry</h2>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Your Quotation</h2>
             </div>
 
-            {/* Form Fields: General pricing and timelines */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left">
+            {/* Form Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-500 dark:text-slate-450">Delivery Timeline (Days) <span className="text-rose-500">*</span></label>
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-450">Valid Till / Terms</label>
+                <input 
+                  type="text" 
+                  value={validTill}
+                  onChange={(e) => setValidTill(e.target.value)}
+                  placeholder="e.g. 30 Days"
+                  className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm bg-slate-50/50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-450">Tax (%)</label>
                 <div className="relative">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Percent className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                   <input 
                     type="number" 
-                    min="1"
-                    value={deliveryDays}
-                    onChange={(e) => setDeliveryDays(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-full pl-10 pr-3 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm bg-slate-50/50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                    required
+                    value={taxPercent}
+                    onChange={(e) => setTaxPercent(Math.max(0, parseFloat(e.target.value) || 0))}
+                    className="w-full pr-8 pl-3 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm bg-slate-50/50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
-                <p className="text-[10px] text-slate-400">Specify lead time to transport items to VendorBridge warehouse.</p>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-500 dark:text-slate-450">Estimated Shipping Method</label>
-                <select className="w-full px-3.5 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <option>Expedited Road Logistics</option>
-                  <option>Air Cargo Freight</option>
-                  <option>Sea Vessel Carrier</option>
-                </select>
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-450">GST (%)</label>
+                <div className="relative">
+                  <Percent className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                  <input 
+                    type="number" 
+                    value={gstPercent}
+                    onChange={(e) => setGstPercent(Math.max(0, parseFloat(e.target.value) || 0))}
+                    className="w-full pr-8 pl-3 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm bg-slate-50/50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Line Items Table with editable unit prices */}
+            {/* Line Items Table with editable unit prices & delivery timelines */}
             <div className="space-y-3 text-left">
               <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider">Line Item Pricing Worksheet</h3>
               
@@ -209,10 +219,11 @@ export default function VendorQuoteSubmission() {
                 <table className="w-full border-collapse text-left min-w-[550px] text-xs">
                   <thead>
                     <tr className="bg-slate-50 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase">
-                      <th className="py-2.5 px-4 w-3/5">Item Description</th>
-                      <th className="py-2.5 px-4 w-20 text-center">Quantity</th>
-                      <th className="py-2.5 px-4 w-32 text-right">Unit Price ($) <span className="text-rose-500">*</span></th>
-                      <th className="py-2.5 px-4 w-32 text-right">Line Total</th>
+                      <th className="py-2.5 px-4 w-1/3">Item Description</th>
+                      <th className="py-2.5 px-4 w-16 text-center">Quantity</th>
+                      <th className="py-2.5 px-4 w-24 text-right">Unit Price ($) <span className="text-rose-500">*</span></th>
+                      <th className="py-2.5 px-4 w-24 text-center">Delivery (Days)</th>
+                      <th className="py-2.5 px-4 w-24 text-right">Line Total</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -233,13 +244,22 @@ export default function VendorQuoteSubmission() {
                                 type="number" 
                                 step="0.01"
                                 min="0.01"
-                                placeholder={item.defaultPrice.toFixed(2)}
+                                placeholder={item.defaultPrice.toString()}
                                 value={item.unitPrice}
                                 onChange={(e) => handlePriceChange(item.id, e.target.value)}
-                                className="w-full pl-7 pr-2.5 py-1.5 border border-slate-200 dark:border-slate-850 bg-transparent rounded-md text-right focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                className="w-full pl-7 pr-2.5 py-1 bg-transparent border border-slate-200 dark:border-slate-850 rounded-md text-right focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                 required
                               />
                             </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <input 
+                              type="number"
+                              min="1"
+                              value={item.deliveryDays || 10}
+                              onChange={(e) => handleDeliveryChange(item.id, e.target.value)}
+                              className="w-16 mx-auto py-1 px-2 border border-slate-200 dark:border-slate-850 bg-transparent rounded-md text-center focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                            />
                           </td>
                           <td className="py-3 px-4 text-right font-mono font-semibold text-slate-900 dark:text-slate-150">
                             ${lineTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -249,10 +269,22 @@ export default function VendorQuoteSubmission() {
                     })}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-indigo-50/10 dark:bg-slate-850/40 border-t border-slate-200 dark:border-slate-800 font-bold">
-                      <td colSpan="3" className="py-3 px-4 text-slate-900 dark:text-white uppercase tracking-wider text-right font-bold">Quotation Subtotal:</td>
-                      <td className="py-3 px-4 text-right font-mono text-indigo-650 dark:text-indigo-400 text-sm">
+                    <tr className="bg-slate-50/40 dark:bg-slate-850/20 border-t border-slate-200 dark:border-slate-800">
+                      <td colSpan="4" className="py-2.5 px-4 text-slate-550 text-right">Subtotal:</td>
+                      <td className="py-2.5 px-4 text-right font-mono text-slate-700 dark:text-slate-300">
                         ${calculateSubtotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </td>
+                    </tr>
+                    <tr className="bg-slate-50/45 dark:bg-slate-850/25">
+                      <td colSpan="4" className="py-1 px-4 text-slate-500 text-right">Tax & GST Summary:</td>
+                      <td className="py-1 px-4 text-right font-mono text-slate-500">
+                        ${(calculateSubtotal() * ((taxPercent + gstPercent) / 100)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </td>
+                    </tr>
+                    <tr className="bg-indigo-50/10 dark:bg-slate-850/40 border-t border-slate-200 dark:border-slate-800 font-bold">
+                      <td colSpan="4" className="py-3 px-4 text-slate-900 dark:text-white uppercase tracking-wider text-right font-bold text-xs">Grand Total:</td>
+                      <td className="py-3 px-4 text-right font-mono text-indigo-600 dark:text-indigo-400 text-sm">
+                        ${calculateGrandTotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
                     </tr>
                   </tfoot>
@@ -267,7 +299,7 @@ export default function VendorQuoteSubmission() {
                 rows="3"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Specify warranty warranties, price validity expiration, payment terms, or shipping exemptions..."
+                placeholder="Specify warranties, price validity expiration, payment terms, or shipping exemptions..."
                 className="w-full px-3.5 py-2 border border-slate-200 dark:border-slate-850 rounded-lg text-xs bg-slate-50/50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
             </div>
@@ -277,7 +309,7 @@ export default function VendorQuoteSubmission() {
               <button 
                 type="button"
                 onClick={handleSaveDraft}
-                className="flex items-center gap-1.5 px-4 py-2 border border-slate-250 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-650 dark:text-slate-350 text-xs font-bold rounded-lg transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-2 border border-slate-250 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-655 dark:text-slate-355 text-xs font-bold rounded-lg transition-colors cursor-pointer"
               >
                 <Save className="h-4 w-4" />
                 Save Draft
@@ -287,7 +319,7 @@ export default function VendorQuoteSubmission() {
                 className="flex items-center gap-1.5 px-4.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-lg transition-all hover:shadow shadow-indigo-600/10 cursor-pointer"
               >
                 <Send className="h-4 w-4" />
-                Quotation Submission
+                Submit Quotation
               </button>
             </div>
           </form>

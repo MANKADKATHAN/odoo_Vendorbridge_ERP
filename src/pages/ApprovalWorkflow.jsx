@@ -247,7 +247,7 @@ export default function ApprovalWorkflow() {
                     </button>
                     <button 
                       onClick={() => handleApprove(selectedApproval.id)}
-                      className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 bg-indigo-650 hover:bg-indigo-750 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/10 cursor-pointer hover:shadow-indigo-600/25 transition-all"
+                      className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/10 cursor-pointer hover:shadow-indigo-600/25 transition-all"
                     >
                       <Check className="h-4 w-4" />
                       Approve & Release

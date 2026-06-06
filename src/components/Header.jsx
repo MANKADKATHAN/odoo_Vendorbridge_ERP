@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Bell, Search, Check, ShieldAlert, CheckCircle2, Info } from 'lucide-react';
+import { Menu, Bell, Search, Check, ShieldAlert, CheckCircle2, Info, LogOut } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
 
-export default function Header({ setIsMobileOpen }) {
+export default function Header({ setIsMobileOpen, currentUser, onLogout }) {
   const { notifications, markAllNotificationsRead } = useDashboard();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const notifRef = useRef(null);
@@ -123,15 +123,28 @@ export default function Header({ setIsMobileOpen }) {
           )}
         </div>
 
-        {/* User profile dropdown info */}
-        <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
+        {/* User profile info & logout */}
+        <div className="flex items-center gap-3 pl-3 border-l border-slate-200 text-left">
           <div className="text-right hidden sm:block">
-            <p className="text-xs font-semibold text-slate-800 leading-tight">Sarah Jenkins</p>
-            <p className="text-[10px] text-slate-500 font-medium leading-tight">Procurement Manager</p>
+            <p className="text-xs font-semibold text-slate-800 leading-tight">
+              {currentUser?.name || 'Admin Demo'}
+            </p>
+            <p className="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">
+              {currentUser?.role || 'Procurement Lead'}
+            </p>
           </div>
-          <div className="h-9 w-9 rounded-xl bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center justify-center font-bold font-heading">
-            SJ
+          <div className="h-9 w-9 rounded-xl bg-indigo-50/60 text-indigo-600 border border-indigo-100 flex items-center justify-center font-bold font-heading select-none">
+            {currentUser?.name?.split(' ').map(n => n.charAt(0)).join('') || 'AD'}
           </div>
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="p-2 rounded-xl border border-slate-200 hover:border-rose-200 hover:bg-rose-50/50 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+              title="Sign Out"
+            >
+              <LogOut className="h-4.5 w-4.5" />
+            </button>
+          )}
         </div>
       </div>
     </header>
