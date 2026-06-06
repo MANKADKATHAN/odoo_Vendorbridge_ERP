@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+}
+
+/* Base custom styles to enhance appearance */
+@layer base {
+  body {
+    background-color: #f8fafc; /* slate-50 */
+    color: #0f172a; /* slate-900 */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Animations and transitions custom utilities */
+.transition-all-custom {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-1rem) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Print Media Styles to enable clean PDF / Paper exports */
+@media print {
+  /* Hide navigation, sidebar, headers, toast notifications, and all action buttons */
+  aside, 
+  header, 
+  nav, 
+  button, 
+  .no-print,
+  #toast-container {
+    display: none !important;
+  }
+  
+  /* Reset background and layout settings to print clean pages */
+  body, 
+  html, 
+  main, 
+  div, 
+  section,
+  .bg-slate-900,
+  .bg-slate-950 {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+    height: auto !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border-color: #e2e8f0 !important;
+  }
+  
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Preserve high-contrast text colors */
+  text, 
+  span, 
+  p, 
+  h1, 
+  h2, 
+  h3, 
+  h4,
+  td,
+  th {
+    color: #000000 !important;
+  }
+}
