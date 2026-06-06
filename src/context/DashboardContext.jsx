@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 const DashboardContext = createContext();
 
@@ -172,6 +172,61 @@ export const DashboardProvider = ({ children }) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
+  // Fetch Vendors and RFQs from backend with Authorization Bearer header
+  useEffect(() => {
+    const fetchApiData = async () => {
+      const token = '5b3f7a1e0bca4876b6de52382c75a89274534ef0da05cf14e7a89270df8276f3';
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      // Determine backend host (FastAPI typical fallback is http://localhost:8000)
+      const apiBase = window.location.origin.includes('localhost:5173') 
+        ? 'http://localhost:8000' 
+        : window.location.origin;
+
+      try {
+        console.log(`[ERP API] Requesting /vendors with Authorization Bearer token...`);
+        const vendorsRes = await fetch(`${apiBase}/vendors`, { headers });
+        if (vendorsRes.ok) {
+          const vendorsData = await vendorsRes.json();
+          setVendors(vendorsData.map(v => ({
+            id: `VEN-0${v.id || '00' + v.user_id}`,
+            name: v.company_name,
+            category: v.category,
+            rating: v.rating || 5.0,
+            status: v.status === 'APPROVED' ? 'Active' : v.status === 'PENDING' ? 'Pending Verification' : 'Inactive'
+          })));
+          console.log(`[ERP API] /vendors loaded successfully.`);
+        }
+      } catch (err) {
+        console.warn(`[ERP API] /vendors offline. Local mock fallback active:`, err.message);
+      }
+
+      try {
+        console.log(`[ERP API] Requesting /rfqs with Authorization Bearer token...`);
+        const rfqsRes = await fetch(`${apiBase}/rfqs`, { headers });
+        if (rfqsRes.ok) {
+          const rfqsData = await rfqsRes.json();
+          setRfqs(rfqsData.map(r => ({
+            id: `RFQ-2026-0${r.id}`,
+            subject: r.title,
+            bidsCount: r.quotations ? r.quotations.length : 0,
+            closeDate: new Date(r.deadline).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+            status: r.status === 'OPEN' ? 'Open' : r.status === 'CLOSED' ? 'Closed' : 'Draft',
+            vendorCategory: r.category || 'Electrical Components'
+          })));
+          console.log(`[ERP API] /rfqs loaded successfully.`);
+        }
+      } catch (err) {
+        console.warn(`[ERP API] /rfqs offline. Local mock fallback active:`, err.message);
+      }
+    };
+
+    fetchApiData();
+  }, []);
+
   // Action: Approve Request
   const approveRequest = useCallback((approvalId) => {
     const approval = approvals.find((a) => a.id === approvalId);
@@ -245,7 +300,7 @@ export const DashboardProvider = ({ children }) => {
   }, [approvals, addToast]);
 
   // Action: Create RFQ
-  const createRFQ = useCallback((rfqData) => {
+  const createRFQ = useCallback(async (rfqData) => {
     const newId = `RFQ-2026-0${rfqs.length + 12}`;
     const newRfq = {
       id: newId,
@@ -272,10 +327,36 @@ export const DashboardProvider = ({ children }) => {
     setNotifications((prev) => [newNotification, ...prev]);
 
     addToast(`RFQ ${newId} has been created successfully.`, 'success');
+
+    // API Post Integration
+    try {
+      const token = '5b3f7a1e0bca4876b6de52382c75a89274534ef0da05cf14e7a89270df8276f3';
+      const apiBase = window.location.origin.includes('localhost:5173') 
+        ? 'http://localhost:8000' 
+        : window.location.origin;
+
+      await fetch(`${apiBase}/rfqs`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: rfqData.subject,
+          description: rfqData.description || 'Request for quotations',
+          quantity: rfqData.quantity || 100,
+          deadline: new Date(rfqData.closeDate || Date.now()).toISOString(),
+          status: 'OPEN',
+          created_by: 1
+        })
+      });
+    } catch (err) {
+      console.warn(`[ERP API] createRFQ post failed. API offline:`, err.message);
+    }
   }, [rfqs, addToast]);
 
   // Action: Add Vendor
-  const addVendor = useCallback((vendorData) => {
+  const addVendor = useCallback(async (vendorData) => {
     const newId = `VEN-0${vendors.length + 10}`;
     const newVendor = {
       id: newId,
@@ -297,6 +378,34 @@ export const DashboardProvider = ({ children }) => {
     setNotifications((prev) => [newNotification, ...prev]);
 
     addToast(`Vendor "${vendorData.name}" has been registered.`, 'success');
+
+    // API Post Integration
+    try {
+      const token = '5b3f7a1e0bca4876b6de52382c75a89274534534ef0da05cf14e7a89270df8276f3'; // Fallback token alignment
+      const activeToken = '5b3f7a1e0bca4876b6de52382c75a89274534ef0da05cf14e7a89270df8276f3';
+      const apiBase = window.location.origin.includes('localhost:5173') 
+        ? 'http://localhost:8000' 
+        : window.location.origin;
+
+      await fetch(`${apiBase}/vendors`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${activeToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          company_name: vendorData.name,
+          gst_number: vendorData.gst || `27NEW${Date.now()}1Z5`,
+          phone: vendorData.phone || '+1-555-0199',
+          category: vendorData.category,
+          rating: 5.0,
+          status: 'PENDING',
+          user_id: 2
+        })
+      });
+    } catch (err) {
+      console.warn(`[ERP API] addVendor post failed. API offline:`, err.message);
+    }
   }, [vendors, addToast]);
 
   // Action: Generate Purchase Order

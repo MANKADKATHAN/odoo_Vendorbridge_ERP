@@ -31,5 +31,7 @@
   - `[x]` **Reports & Analytics (`src/pages/ReportsAnalytics.jsx`)**: Spend trends and distributions bar/pie recharts analytics.
 - `[x]` Reusable visual elements
   - `[x]` **Workflow Tracker (`src/components/WorkflowTracker.jsx`)**: Responsive 6-step progress indicator tracking RFQ, Submission, Comparison, Approval, PO, and Fulfillment phases.
+- `[x]` API & Security Integrations
+  - `[x]` Attach `Authorization: Bearer <token>` token header on fetch requests to `/vendors` and `/rfqs` endpoints.
 - `[x]` Build Verification & Manual Checks
   - `[x]` Compile check with `npm run build` (build succeeded completely)
