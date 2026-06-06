@@ -1,10 +1,12 @@
-# VendorBridge Procurement & Vendor Management Backend
+# VendorBridge Procurement & Vendor Management Platform
 
-Welcome to the backend API skeleton for **VendorBridge** - a procurement and vendor management platform.
-
-This skeleton is built as a production-ready FastAPI codebase following **clean architecture** and **modular design** principles. It segregates logic into Routers, Schemas, Services, and Utilities. All storage is currently managed by a thread-safe, in-memory mock database that can be easily plugged into a real SQL or NoSQL database later.
+Centralized procurement platform that streamlines vendor onboarding, quotation management, purchase approvals, order tracking, and analytics, helping organizations digitize and optimize procurement workflows.
 
 ---
+
+# 💻 Backend (FastAPI API)
+
+This backend is built as a production-ready FastAPI codebase following **clean architecture** and **modular design** principles. It connects to a live MySQL database on Railway.
 
 ## Project Folder Structure
 
@@ -49,7 +51,7 @@ odoo_Vendorbridge_ERP/
 
 ---
 
-## Setup & Running Guide
+## Setup & Running Guide (Backend)
 
 ### 1. Create and Activate Virtual Environment
 ```powershell
@@ -88,232 +90,24 @@ To transition from the current in-memory mock database to a real database (e.g. 
 
 ---
 
-## Sample API Requests & Responses
+# 🎨 Frontend (React + Vite)
 
-### 1. Authentication
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-#### **Register User (`POST /auth/register`)**
-* **Request Body:**
-  ```json
-  {
-    "username": "buyer_bob",
-    "email": "bob@vendorbridge.com",
-    "password": "password123",
-    "full_name": "Bob Buyer",
-    "role": "buyer"
-  }
-  ```
-* **Response (HTTP 201):**
-  ```json
-  {
-    "id": "2",
-    "username": "buyer_bob",
-    "email": "bob@vendorbridge.com",
-    "full_name": "Bob Buyer",
-    "role": "buyer",
-    "created_at": "2026-06-06T09:48:25.123456Z"
-  }
-  ```
+Currently, two official plugins are available:
 
-#### **Login User (`POST /auth/login`)**
-* **Request Body:**
-  ```json
-  {
-    "username_or_email": "admin@vendorbridge.com",
-    "password": "password123"
-  }
-  ```
-* **Response (HTTP 200):**
-  ```json
-  {
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "token_type": "bearer"
-  }
-  ```
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-#### **Get Logged-in User Profile (`GET /auth/me`)**
-* **Headers:** `Authorization: Bearer <token>`
-* **Response (HTTP 200):**
-  ```json
-  {
-    "id": "1",
-    "username": "admin",
-    "email": "admin@vendorbridge.com",
-    "full_name": "System Administrator",
-    "role": "admin",
-    "created_at": "2026-06-06T09:46:00Z"
-  }
-  ```
+## Setup & Running Guide (Frontend)
 
----
-
-### 2. Vendor Management
-
-#### **Create Vendor (`POST /vendors`)**
-* **Headers:** `Authorization: Bearer <token>`
-* **Request Body:**
-  ```json
-  {
-    "name": "Consolidated Parts Inc.",
-    "contact_name": "Alice Vance",
-    "email": "alice@consolidated.com",
-    "phone": "+1-202-555-0143",
-    "address": "789 Industrial Blvd, Detroit, MI",
-    "website": "https://consolidatedparts.com"
-  }
-  ```
-* **Response (HTTP 201):**
-  ```json
-  {
-    "id": "3",
-    "name": "Consolidated Parts Inc.",
-    "contact_name": "Alice Vance",
-    "email": "alice@consolidated.com",
-    "phone": "+1-202-555-0143",
-    "address": "789 Industrial Blvd, Detroit, MI",
-    "website": "https://consolidatedparts.com",
-    "status": "active",
-    "created_at": "2026-06-06T09:50:00Z",
-    "updated_at": "2026-06-06T09:50:00Z"
-  }
-  ```
-
-#### **Get Vendor by ID (`GET /vendors/{id}`)**
-* **Headers:** `Authorization: Bearer <token>`
-* **Response (HTTP 200):**
-  ```json
-  {
-    "id": "1",
-    "name": "Global Tech Logistics",
-    "contact_name": "John Doe",
-    "email": "john.doe@globaltech.com",
-    "phone": "+1-555-0199",
-    "address": "123 Logistics Way, Silicon Valley, CA",
-    "website": "https://globaltech.com",
-    "status": "active",
-    "created_at": "2026-06-06T09:46:00Z",
-    "updated_at": "2026-06-06T09:46:00Z"
-  }
-  ```
-
----
-
-### 3. RFQ Management
-
-#### **Create RFQ (`POST /rfqs`)**
-* **Headers:** `Authorization: Bearer <token>`
-* **Request Body:**
-  ```json
-  {
-    "title": "Purchase of Office Moniters",
-    "description": "RFQ for 30 IPS monitors 27 inch 4K.",
-    "deadline": "2026-10-31T23:59:59Z",
-    "items": [
-      {
-        "name": "27-inch 4K Monitor",
-        "quantity": 30,
-        "description": "IPS panel, color calibrated"
-      }
-    ]
-  }
-  ```
-* **Response (HTTP 201):**
-  ```json
-  {
-    "id": "3",
-    "title": "Purchase of Office Moniters",
-    "description": "RFQ for 30 IPS monitors 27 inch 4K.",
-    "deadline": "2026-10-31T23:59:59Z",
-    "items": [
-      {
-        "name": "27-inch 4K Monitor",
-        "quantity": 30,
-        "description": "IPS panel, color calibrated"
-      }
-    ],
-    "status": "open",
-    "created_at": "2026-06-06T09:51:00Z",
-    "updated_at": "2026-06-06T09:51:00Z"
-  }
-  ```
-
----
-
-### 4. Quotation Management
-
-#### **Submit Quotation (`POST /quotations`)**
-* **Headers:** `Authorization: Bearer <token>`
-* **Request Body:**
-  ```json
-  {
-    "rfq_id": "1",
-    "vendor_id": "1",
-    "total_amount": 72500.0,
-    "details": "Offer with free shipping and bulk discount.",
-    "delivery_date": "2026-08-01T12:00:00Z"
-  }
-  ```
-* **Response (HTTP 201):**
-  ```json
-  {
-    "id": "2",
-    "rfq_id": "1",
-    "vendor_id": "1",
-    "total_amount": 72500.0,
-    "details": "Offer with free shipping and bulk discount.",
-    "delivery_date": "2026-08-01T12:00:00Z",
-    "status": "pending",
-    "created_at": "2026-06-06T09:52:00Z",
-    "updated_at": "2026-06-06T09:52:00Z"
-  }
-  ```
-
-#### **Accept Quotation (`PUT /quotations/{id}`)**
-* **Headers:** `Authorization: Bearer <token>`
-* **Request Body:**
-  ```json
-  {
-    "status": "accepted"
-  }
-  ```
-* **Response (HTTP 200):**
-  ```json
-  {
-    "id": "1",
-    "rfq_id": "1",
-    "vendor_id": "1",
-    "total_amount": 75000.0,
-    "details": "We offer Laptop Model X with complete 3 year warranty and immediate support.",
-    "delivery_date": "2026-07-15T00:00:00Z",
-    "status": "accepted",
-    "created_at": "2026-06-06T09:46:00Z",
-    "updated_at": "2026-06-06T09:53:00Z"
-  }
-  ```
-
----
-
-### 5. Dashboard Summary
-
-#### **Get Summary Metrics (`GET /dashboard/summary`)**
-* **Headers:** `Authorization: Bearer <token>`
-* **Response (HTTP 200):**
-  ```json
-  {
-    "total_vendors": 2,
-    "total_rfqs": 2,
-    "total_quotations": 1,
-    "total_spend": 75000.0,
-    "rfq_status_breakdown": {
-      "draft": 1,
-      "open": 1,
-      "closed": 0,
-      "awarded": 0
-    },
-    "quotation_status_breakdown": {
-      "pending": 0,
-      "accepted": 1,
-      "rejected": 0
-    }
-  }
-  ```
+1. Navigate to the root folder.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development build:
+   ```bash
+   npm run dev
+   ```
+   The React dashboard will be running on: `http://localhost:5173`.
