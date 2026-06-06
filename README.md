@@ -4,110 +4,83 @@ Centralized procurement platform that streamlines vendor onboarding, quotation m
 
 ---
 
-# 💻 Backend (FastAPI API)
+# 📂 Project Folder Structure
 
-This backend is built as a production-ready FastAPI codebase following **clean architecture** and **modular design** principles. It connects to a live MySQL database on Railway.
-
-## Project Folder Structure
-
+This repository is organized into distinct frontend and backend directories:
 ```
 odoo_Vendorbridge_ERP/
-├── app/
-│   ├── __init__.py
-│   ├── main.py                  # API entry point, CORS, middlewares, global exception handling
-│   ├── core/
-│   │   ├── __init__.py
-│   │   ├── config.py            # Pydantic Settings (manages configs & JWT secrets)
-│   │   ├── security.py          # Password hashing context (bcrypt) & JWT operations
-│   │   └── dependencies.py      # Injection dependencies (OAuth2 schema, get_current_user)
-│   ├── routes/
-│   │   ├── __init__.py
-│   │   ├── auth.py              # Register, Login, Me endpoints
-│   │   ├── vendors.py           # CRUD endpoints for Vendors
-│   │   ├── rfqs.py              # CRUD endpoints for RFQs
-│   │   ├── quotations.py        # CRUD endpoints for Quotations
-│   │   └── dashboard.py         # Summary analytics dashboard
-│   ├── schemas/
-│   │   ├── __init__.py
-│   │   ├── auth.py              # User inputs, login, and response structures
-│   │   ├── vendor.py            # Vendor CRUD schemas
-│   │   ├── rfq.py               # RFQ and line item structures
-│   │   ├── quotation.py         # Quotation CRUD schemas
-│   │   └── dashboard.py         # Dashboard analytics schemas
-│   ├── services/
-│   │   ├── __init__.py
-│   │   ├── mock_db.py           # Thread-safe in-memory database with seeded mock records
-│   │   ├── auth.py              # User registration and verification logic
-│   │   ├── vendor.py            # Vendor business CRUD operations
-│   │   ├── rfq.py               # RFQ business CRUD operations
-│   │   ├── quotation.py         # Quotation business CRUD operations
-│   │   └── dashboard.py         # Metrics calculations and analytics
-│   └── utils/
-│       ├── __init__.py
-│       └── helpers.py           # General utility helpers (empty package ready for helpers)
-├── requirements.txt             # Project library dependencies
-└── README.md                    # Backend setup and documentation
+├── backend/                  # FastAPI Application
+│   ├── app/                  # Route, schema, and service definitions
+│   ├── requirements.txt      # Python dependencies
+│   ├── database.py           # DB connection layer
+│   ├── models.py             # ORM models (SQLAlchemy)
+│   ├── main.py               # API startup entry point
+│   └── .env                  # Backend environment variables
+└── frontend/                 # React Vite Client
+    ├── src/                  # React components, contexts, and pages
+    ├── public/               # Public icons and logos
+    ├── package.json          # Node dependencies
+    └── vite.config.js        # Vite compilation configurations
 ```
 
 ---
 
-## Setup & Running Guide (Backend)
+# 💻 Backend Setup & Running Guide (FastAPI)
+
+The backend is built using FastAPI following a clean modular design. It connects to a live MySQL instance on Railway.
 
 ### 1. Create and Activate Virtual Environment
+From the root directory:
 ```powershell
-python -m venv venv
+# Create venv at root if not already done:
+python -m venv venv-312
+
 # On Windows (PowerShell):
-.\venv\Scripts\Activate.ps1
+.\venv-312\Scripts\Activate.ps1
 # On Linux/macOS:
-source venv/bin/activate
+source venv-312/bin/activate
 ```
 
 ### 2. Install Dependencies
 ```powershell
+cd backend
 pip install -r requirements.txt
 ```
 
 ### 3. Run the Backend Server
 ```powershell
-uvicorn app.main:app --reload
+# Make sure you are inside the backend directory:
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
-Once the server is running, the API will be available at: `http://127.0.0.1:8000`
+Once running, the API is accessible at: `http://127.0.0.1:8000`
 
 ### 4. Interactive Swagger Documentation
-Open your browser and navigate to:
-**[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
-Here you can interactively test every endpoint with visual payloads and authentication triggers.
+Open your browser and navigate to: **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)** to test endpoints interactively.
 
 ---
 
-## Database Integration Plug-In Plan
+# 🎨 Frontend Setup & Running Guide (React + Vite)
 
-To transition from the current in-memory mock database to a real database (e.g. PostgreSQL or MySQL):
-1. **Configure Environment Connection:** Add your database URL in `app/core/config.py` (via the `DATABASE_URL` settings property or a `.env` file).
-2. **Setup Session Dependency:** Create a database connection helper under `app/core/` (e.g. `database.py` utilizing SQLAlchemy or SQLModel) to yield a `Session` object.
-3. **Generate ORM Models:** Create database tables corresponding to the entities using your ORM framework.
-4. **Modify Service Methods:** In each file under `app/services/` (such as `vendor.py`, `rfq.py`, etc.), swap the queries targeting `db.vendors` or `db.rfqs` with standard ORM queries (e.g. `db_session.query(Vendor).all()`). No route endpoints or Pydantic validation rules need to change.
+The frontend client is built using React, Vite, and TailwindCSS, communicating with the FastAPI backend.
+
+### 1. Navigate and Install Dependencies
+From the root directory:
+```bash
+cd frontend
+npm install
+```
+
+### 2. Run the Development Server
+```bash
+npm run dev
+```
+The frontend dashboard will be active on: **[http://localhost:5173](http://localhost:5173)**.
 
 ---
 
-# 🎨 Frontend (React + Vite)
+# ☁️ Cloud Deployments Configuration
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+When deploying this repository to cloud platforms, ensure you configure the subdirectory root settings:
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## Setup & Running Guide (Frontend)
-
-1. Navigate to the root folder.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Run the development build:
-   ```bash
-   npm run dev
-   ```
-   The React dashboard will be running on: `http://localhost:5173`.
+- **Vercel (Frontend Client):** Set the **Project Root Directory** to `frontend`.
+- **Render / Heroku (Backend API):** Set the **Web Service Root Directory** to `backend`.
