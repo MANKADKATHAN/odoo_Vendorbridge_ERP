@@ -184,9 +184,9 @@ export const DashboardProvider = ({ children }) => {
       };
 
       // Determine backend host (FastAPI typical fallback is http://localhost:8000)
-      const apiBase = window.location.origin.includes('localhost:5173') 
+      const apiBase = import.meta.env.VITE_API_URL || (window.location.origin.includes('localhost:5173') 
         ? 'http://localhost:8000' 
-        : window.location.origin;
+        : window.location.origin);
 
       try {
         console.log(`[ERP API] Requesting /vendors with Authorization Bearer token...`);
@@ -333,9 +333,9 @@ export const DashboardProvider = ({ children }) => {
     // API Post Integration
     try {
       const token = '5b3f7a1e0bca4876b6de52382c75a89274534ef0da05cf14e7a89270df8276f3';
-      const apiBase = window.location.origin.includes('localhost:5173') 
+      const apiBase = import.meta.env.VITE_API_URL || (window.location.origin.includes('localhost:5173') 
         ? 'http://localhost:8000' 
-        : window.location.origin;
+        : window.location.origin);
 
       await fetch(`${apiBase}/rfqs`, {
         method: 'POST',
@@ -385,9 +385,9 @@ export const DashboardProvider = ({ children }) => {
     try {
       const token = '5b3f7a1e0bca4876b6de52382c75a89274534534ef0da05cf14e7a89270df8276f3'; // Fallback token alignment
       const activeToken = '5b3f7a1e0bca4876b6de52382c75a89274534ef0da05cf14e7a89270df8276f3';
-      const apiBase = window.location.origin.includes('localhost:5173') 
+      const apiBase = import.meta.env.VITE_API_URL || (window.location.origin.includes('localhost:5173') 
         ? 'http://localhost:8000' 
-        : window.location.origin;
+        : window.location.origin);
 
       await fetch(`${apiBase}/vendors`, {
         method: 'POST',
