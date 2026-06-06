@@ -9,7 +9,8 @@ import {
   History,
   ChevronLeft, 
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  ClipboardCheck
 } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
 
@@ -19,6 +20,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/', badge: null },
     { name: 'Vendors & Partners', icon: Users, path: '/vendors', badge: null },
+    { name: 'Submit Quotation', icon: ClipboardCheck, path: '/quote-submission', badge: null },
     { name: 'Quotation Evaluation', icon: FileText, path: '/quotation-comparison', badge: stats.activeRfqs },
     { name: 'Approval Inbox', icon: ShieldCheck, path: '/approval-workflow', badge: stats.pendingApprovals > 0 ? stats.pendingApprovals : null },
     { name: 'PO & Invoice Ledger', icon: FileSpreadsheet, path: '/po-invoice', badge: null },

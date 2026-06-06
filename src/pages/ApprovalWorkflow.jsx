@@ -14,6 +14,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
+import WorkflowTracker from '../components/WorkflowTracker';
 
 export default function ApprovalWorkflow() {
   const { approvals, approveRequest, rejectRequest, addToast } = useDashboard();
@@ -120,6 +121,9 @@ export default function ApprovalWorkflow() {
 
   return (
     <div className="space-y-6">
+      {/* Workflow Progress Tracker */}
+      <WorkflowTracker currentStep={4} />
+
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold font-heading text-slate-900 dark:text-white">Approval Workflow Inbox</h1>

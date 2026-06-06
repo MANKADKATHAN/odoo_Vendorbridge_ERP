@@ -13,6 +13,7 @@ import ApprovalWorkflow from './pages/ApprovalWorkflow';
 import PoInvoiceGeneration from './pages/PoInvoiceGeneration';
 import ActivityLogs from './pages/ActivityLogs';
 import ReportsAnalytics from './pages/ReportsAnalytics';
+import VendorQuoteSubmission from './pages/VendorQuoteSubmission';
 
 function AppContent() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -28,6 +29,7 @@ function AppContent() {
         <Route path="/vendors" element={<VendorManagement />} />
         <Route path="/rfq/create" element={<RfqCreation />} />
         <Route path="/quotation-comparison" element={<QuotationComparison />} />
+        <Route path="/quote-submission" element={<VendorQuoteSubmission />} />
         <Route path="/approval-workflow" element={<ApprovalWorkflow />} />
         <Route path="/po-invoice" element={<PoInvoiceGeneration />} />
         <Route path="/reports-analytics" element={<ReportsAnalytics />} />

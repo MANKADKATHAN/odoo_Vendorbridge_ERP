@@ -12,6 +12,7 @@ import {
   TrendingDown
 } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
+import WorkflowTracker from '../components/WorkflowTracker';
 
 export default function QuotationComparison() {
   const { rfqs, addToast, generatePO } = useDashboard();
@@ -143,6 +144,9 @@ export default function QuotationComparison() {
 
   return (
     <div className="space-y-6">
+      {/* Workflow Progress Tracker */}
+      <WorkflowTracker currentStep={3} />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

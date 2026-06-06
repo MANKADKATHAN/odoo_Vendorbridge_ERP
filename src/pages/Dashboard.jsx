@@ -4,6 +4,7 @@ import StatsGrid from '../components/StatsGrid';
 import QuickActions from '../components/QuickActions';
 import RecentOrdersTable from '../components/RecentOrdersTable';
 import PendingApprovalsList from '../components/PendingApprovalsList';
+import WorkflowTracker from '../components/WorkflowTracker';
 
 // Modals
 import AddVendorModal from '../components/modals/AddVendorModal';
@@ -24,6 +25,9 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Visual Reusable Workflow Tracker */}
+      <WorkflowTracker currentStep={1} />
+
       {/* Analytics Cards (Top Row) */}
       <StatsGrid />
 

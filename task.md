@@ -20,14 +20,16 @@
   - `[x]` Migrate App content to `src/pages/Dashboard.jsx` and configure router inside `src/App.jsx`
   - `[x]` Update `src/components/Sidebar.jsx` to navigate routes using `NavLink` components
 - `[x]` Page Screen Implementations
-  - `[x]` **Login / Register Page (`src/pages/Login.jsx`)**: Stateful auth session screen featuring a side brand showcase and login/registration toggle panels.
+  - `[x]` **Login / Register Page (`src/pages/Login.jsx`)**: Redesigned to support centered split cards layout, access role dropdown entries, validation handles, and warning ring highlights.
   - `[x]` **Vendor Management (`src/pages/VendorManagement.jsx`)**: Filters, metrics, vendor table directory, and side slide-over detail panels.
   - `[x]` **RFQ Creation Form (`src/pages/RfqCreation.jsx`)**: Full-page form incorporating line items table additions, vendor invites list, and document upload capabilities.
   - `[x]` **Quotation Evaluation Matrix (`src/pages/QuotationComparison.jsx`)**: Side-by-side matrices matching bidder price, compliance and timeline rankings.
+  - `[x]` **Vendor Quotation Submission (`src/pages/VendorQuoteSubmission.jsx`)**: Read-only RFQ specs, line items pricing grid, delivery timelines, notes, and submit actions.
   - `[x]` **Approval Inbox Workflow (`src/pages/ApprovalWorkflow.jsx`)**: Requisition detail timelines with click-to-approve triggers.
   - `[x]` **PO & Invoice Ledger (`src/pages/PoInvoiceGeneration.jsx`)**: Printed document invoice reviews and paid payment registrations.
   - `[x]` **System Audit Trail (`src/pages/ActivityLogs.jsx`)**: Chronological audit trails with pill filters and expansion details.
   - `[x]` **Reports & Analytics (`src/pages/ReportsAnalytics.jsx`)**: Spend trends and distributions bar/pie recharts analytics.
+- `[x]` Reusable visual elements
+  - `[x]` **Workflow Tracker (`src/components/WorkflowTracker.jsx`)**: Responsive 6-step progress indicator tracking RFQ, Submission, Comparison, Approval, PO, and Fulfillment phases.
 - `[x]` Build Verification & Manual Checks
   - `[x]` Compile check with `npm run build` (build succeeded completely)
-  - `[ ]` Visual validation using browser subagent (Skipped due to no-host lookup failures in current sandbox execution env)
