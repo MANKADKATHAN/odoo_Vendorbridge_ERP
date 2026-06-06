@@ -1,75 +1,40 @@
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { DashboardProvider } from './context/DashboardContext';
 import Layout from './components/Layout';
-import StatsGrid from './components/StatsGrid';
-import QuickActions from './components/QuickActions';
-import RecentOrdersTable from './components/RecentOrdersTable';
-import PendingApprovalsList from './components/PendingApprovalsList';
 
-// Modals
-import CreateRFQModal from './components/modals/CreateRFQModal';
-import AddVendorModal from './components/modals/AddVendorModal';
-import GeneratePOModal from './components/modals/GeneratePOModal';
-import PODetailModal from './components/modals/PODetailModal';
+// Pages
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import VendorManagement from './pages/VendorManagement';
+import RfqCreation from './pages/RfqCreation';
+import QuotationComparison from './pages/QuotationComparison';
+import ApprovalWorkflow from './pages/ApprovalWorkflow';
+import PoInvoiceGeneration from './pages/PoInvoiceGeneration';
+import ActivityLogs from './pages/ActivityLogs';
+import ReportsAnalytics from './pages/ReportsAnalytics';
 
 function AppContent() {
-  const [isRFQOpen, setIsRFQOpen] = useState(false);
-  const [isVendorOpen, setIsVendorOpen] = useState(false);
-  const [isPOOpen, setIsPOOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [selectedPO, setSelectedPO] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const handleViewDetails = (po) => {
-    setSelectedPO(po);
-    setIsDetailOpen(true);
-  };
+  if (!currentUser) {
+    return <Login onLoginSuccess={setCurrentUser} />;
+  }
 
   return (
     <Layout>
-      {/* Analytics Cards (Top Row) */}
-      <StatsGrid />
-
-      {/* Quick Action Buttons */}
-      <QuickActions 
-        onCreateRFQ={() => setIsRFQOpen(true)}
-        onAddVendor={() => setIsVendorOpen(true)}
-        onGeneratePO={() => setIsPOOpen(true)}
-      />
-
-      {/* Main Content Area: Two-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-        {/* Left Column: Recent Purchase Orders Table */}
-        <div className="lg:col-span-2">
-          <RecentOrdersTable onViewDetails={handleViewDetails} />
-        </div>
-
-        {/* Right Column: Pending Approvals List */}
-        <div className="lg:col-span-1">
-          <PendingApprovalsList />
-        </div>
-      </div>
-
-      {/* Modals Container */}
-      <CreateRFQModal 
-        isOpen={isRFQOpen} 
-        onClose={() => setIsRFQOpen(false)} 
-      />
-      <AddVendorModal 
-        isOpen={isVendorOpen} 
-        onClose={() => setIsVendorOpen(false)} 
-      />
-      <GeneratePOModal 
-        isOpen={isPOOpen} 
-        onClose={() => setIsPOOpen(false)} 
-      />
-      <PODetailModal 
-        isOpen={isDetailOpen} 
-        onClose={() => {
-          setIsDetailOpen(false);
-          setSelectedPO(null);
-        }}
-        po={selectedPO}
-      />
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/vendors" element={<VendorManagement />} />
+        <Route path="/rfq/create" element={<RfqCreation />} />
+        <Route path="/quotation-comparison" element={<QuotationComparison />} />
+        <Route path="/approval-workflow" element={<ApprovalWorkflow />} />
+        <Route path="/po-invoice" element={<PoInvoiceGeneration />} />
+        <Route path="/reports-analytics" element={<ReportsAnalytics />} />
+        <Route path="/activity-logs" element={<ActivityLogs />} />
+        {/* Fallback route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </Layout>
   );
 }
@@ -77,7 +42,9 @@ function AppContent() {
 export default function App() {
   return (
     <DashboardProvider>
-      <AppContent />
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
     </DashboardProvider>
   );
 }
