@@ -2,8 +2,7 @@ import os
 import sys
 from datetime import datetime, timedelta
 from decimal import Decimal
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from database import engine, SessionLocal
 
 # Import models
 from models import (
@@ -44,18 +43,7 @@ RAW_DATA = [
     {"po_id": "PO-00029", "supplier": "Delta_Logistics", "order_date": "05/04/2023", "delivery_date": "22/04/2023", "category": "MRO", "status": "Delivered", "qty": 1265, "unit_price": 90.26, "neg_price": 79.47, "defective": 187, "compliance": "Yes"}
 ]
 
-# Database connection setup
-# Use environment variable DATABASE_URL if provided, else default to sqlite local db
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///vendorbridge.db")
-
-print(f"Connecting to database: {DATABASE_URL}")
-# For sqlite, we need check_same_thread=False
-if DATABASE_URL.startswith("sqlite"):
-    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-else:
-    engine = create_engine(DATABASE_URL)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Database connection engine and session imported from database.py
 
 def parse_date(date_str):
     if not date_str:
